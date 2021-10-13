@@ -8,13 +8,14 @@ let current_page=1;
 let page_limit=10;
 let morePgs=true;
 
-async function getUsers(page,limit){
+
+async function getUsers(page, limit) {
     const response=await fetch(`http://localhost:3001/api/users?page=${page}&limit=${limit}`)    
     const data= await response.json();
-   console.log(data)
-   displayDiv.innerHTML="";     
-    for(let i=0; i<data.results.length;i++){
-        console.log(data.results[i])
+    //    console.log(data)
+    displayDiv.innerHTML = "";
+    for (let i = 0; i < data.results.length; i++) {
+        // console.log(data.results[i])
              const list=
                 `<ul class="list">  ${data.results[i].name}  
                 <li>Id: ${data.results[i].id}</li>
@@ -24,34 +25,45 @@ async function getUsers(page,limit){
                 <li>Company: ${data.results[i].company}</li>
                 </ul><br>`;
             displayDiv.insertAdjacentHTML("beforeend",list)
-       }    
+    }
     
-       morePgs=data.hasMore;
-       pageEl.textContent=page;
-       
-   console.log(morePgs)
-   console.log(data.results.length)
+    morePgs = data.hasMore;
+    enableDisableBtns(page, morePgs);
+    pageEl.textContent = page;
+    // console.log(morePgs)
+    // console.log(data.results.length)
 }
 
+function enableDisableBtns(page, morePgs) {
+    if (page === 1) {
+        btnPrev.disabled = true;
+        btnNext.disabled = false;
+    } else btnPrev.disabled = false;
+
+    if (morePgs === false) {
+        btnNext.disabled = true;
+        btnPrev.disabled = false;
+    } else btnNext.disabled = false;
+}
 getUsers(current_page,page_limit);
 
 btnPrev.addEventListener('click', (e)=>{
     if(current_page > 1){
         current_page--;
         getUsers(current_page,page_limit)
-    } else{  
-        btnPrev.disapled=true;      
+
+    } else {
         return;
     }
-    pageEl.textContent=current_page;
+    pageEl.textContent = current_page;
+
 })
 
 btnNext.addEventListener('click', (e)=>{
     if(morePgs){
         current_page++;
-    getUsers(current_page,page_limit)
-}else{
-    btnNext.disapled=true;
-}
-pageEl.textContent=current_page;
-})
+        getUsers(current_page, page_limit)
+
+    }
+    pageEl.textContent = current_page;
+});
